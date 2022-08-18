@@ -15,5 +15,6 @@ phases:
       - mvn package -Dnative -Dquarkus.native.container-build=true
 
 artifacts:
+  base-directory: cdk.out
   files:
     - target/function.zip
