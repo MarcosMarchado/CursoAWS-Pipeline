@@ -2,15 +2,18 @@ version: 0.2
 
 phases:
   install:
+    runtime-versions:
+      docker: 18
+      java: correto11
     commands:
-      - npm install -g npm #Instalando a última versão do npm
-      - npm install
+      - mvn install
+  pre_build:
+    commands:
+      - echo Dependencias instaladas...
   build:
     commands:
-      - npm run build
-      - npm run cdk -- synth
+      - mvn package -Dnative -Dquarkus.native.container-build=true
 
 artifacts:
-  base-directory: cdk.out
   files:
-    - '**/*'
+    - target/function.zip
