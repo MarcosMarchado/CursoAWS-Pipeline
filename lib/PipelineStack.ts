@@ -21,7 +21,7 @@ export class PipelineStack extends Stack {
       actions: [
         new GitHubSourceAction({
           owner: "MarcosMarchado",
-          repo: "Lambda-Quarkus",
+          repo: "lambda-quarkus",
           branch: "main",
           actionName: "Pipeline_Source",
           oauthToken: SecretValue.secretsManager("github-token"),
