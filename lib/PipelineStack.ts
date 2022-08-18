@@ -3,7 +3,7 @@ import { BuildSpec, LinuxBuildImage, PipelineProject } from 'aws-cdk-lib/aws-cod
 import { Artifact, Pipeline } from 'aws-cdk-lib/aws-codepipeline';
 import { CodeBuildAction, GitHubSourceAction } from 'aws-cdk-lib/aws-codepipeline-actions';
 import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as Yaml from "yaml"
 
 export class PipelineStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -40,12 +40,35 @@ export class PipelineStack extends Stack {
         outputs: [cdkBuildOutput],
         project: new PipelineProject(this, "CdkBuildProject", {
           environment: {
-            buildImage: LinuxBuildImage.STANDARD_5_0
+            buildImage: LinuxBuildImage.STANDARD_5_0,
+            privileged: true
           },
-          buildSpec: BuildSpec.fromSourceFilename("build-specs/cdk-build-spec.yml")
+          buildSpec: BuildSpec.fromObjectToYaml(this.getBuildSpecYml())
         })
       })]
     })
 
+  }
+  //https://stackoverflow.com/questions/71406505/how-to-writing-the-buildspec-yaml-code-in-cdk
+  getBuildSpecYml() {
+    return Yaml.parse(`
+    version: 0.2
+
+    phases:
+      install:
+        runtime-versions:
+          java: corretto11
+        commands:
+          - mvn install
+      pre_build:
+        commands:
+          - echo Dependencias instaladas...
+      build:
+        commands:
+          - mvn clean package
+    
+    artifacts:
+      files:
+        - target/function.zip`)
   }
 }
